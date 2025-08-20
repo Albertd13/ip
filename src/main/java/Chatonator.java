@@ -13,7 +13,7 @@ public class Chatonator {
         Scanner scanner = new Scanner(System.in);
         String currentCommand;
         while (true) {
-            String[] commandArr = scanner.nextLine().trim().split(" ");
+            String[] commandArr = scanner.nextLine().trim().split(" ", 2);
             currentCommand = commandArr[0];
             if (currentCommand.equals("bye")) {
                 break;
@@ -21,9 +21,28 @@ public class Chatonator {
             String response = switch (currentCommand) {
                 case "list" -> getNumberedMessage();
                 case "mark" -> markTask(commandArr);
+                case "deadline" -> {
+                    String[] taskDetails = commandArr[1].split("/by");
+                    Deadline deadline = new Deadline(taskDetails[0].trim(), taskDetails[1].trim());
+                    tasks.add(deadline);
+                    yield taskAdditionResponse(deadline);
+                }
+                case "todo" -> {
+                    Todo todo = new Todo(commandArr[1]);
+                    tasks.add(todo);
+                    yield taskAdditionResponse(todo);
+                }
+                case "event" ->  {
+                    String[] taskDetails = commandArr[1].split("/from");
+                    String[] periodRange = taskDetails[1].split("/to");
+                    Event event = new Event(taskDetails[0], periodRange[0].trim(), periodRange[1].trim());
+                    tasks.add(event);
+                    yield taskAdditionResponse(event);
+                }
                 default -> {
-                    tasks.add(new Task(currentCommand));
-                    yield "added: " + currentCommand;
+                    Task task = new Task(currentCommand);
+                    tasks.add(task);
+                    yield taskAdditionResponse(task);
                 }
             };
             System.out.println(formatMessage(response));
@@ -54,7 +73,16 @@ public class Chatonator {
             %s""",
             selectedTask
         );
+    }
 
+    private static String taskAdditionResponse(Task task) {
+        return String.format("""
+            Got it. I've added this task:
+                %s
+            Now you have %d tasks in the list.""",
+            task,
+            tasks.size()
+        );
 
     }
     private static String formatMessage(String message) {
