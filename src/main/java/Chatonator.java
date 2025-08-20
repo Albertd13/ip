@@ -1,3 +1,5 @@
+import jdk.jshell.spi.ExecutionControl;
+
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -13,43 +15,67 @@ public class Chatonator {
         Scanner scanner = new Scanner(System.in);
         String currentCommand;
         while (true) {
-            String[] commandArr = scanner.nextLine().trim().split(" ", 2);
-            currentCommand = commandArr[0];
-            if (currentCommand.equals("bye")) {
-                break;
+            try {
+                String[] commandArr = scanner.nextLine().trim().split(" ", 2);
+                currentCommand = commandArr[0];
+                if (currentCommand.equals("bye")) {
+                    break;
+                }
+                String response = switch (currentCommand) {
+                    case "list" -> getNumberedMessage();
+                    case "mark" -> markTask(commandArr);
+                    case "deadline" -> {
+                        Deadline deadline = getDeadline(commandArr);
+                        tasks.add(deadline);
+                        yield taskAdditionResponse(deadline);
+                    }
+                    case "todo" -> {
+                        if (commandArr.length < 2) {
+                            throw new InvalidChatInputException("Give a description for your todo!");
+                        }
+                        Todo todo = new Todo(commandArr[1]);
+                        tasks.add(todo);
+                        yield taskAdditionResponse(todo);
+                    }
+                    case "event" ->  {
+                        Event event = getEvent(commandArr);
+                        tasks.add(event);
+                        yield taskAdditionResponse(event);
+                    }
+                    default -> throw new ExecutionControl.NotImplementedException("Sorry! I do not understand.");
+                };
+                System.out.println(formatMessage(response));
+            } catch (ExecutionControl.NotImplementedException | InvalidChatInputException e) {
+                System.out.println(formatMessage(e.getMessage()));
             }
-            String response = switch (currentCommand) {
-                case "list" -> getNumberedMessage();
-                case "mark" -> markTask(commandArr);
-                case "deadline" -> {
-                    String[] taskDetails = commandArr[1].split("/by");
-                    Deadline deadline = new Deadline(taskDetails[0].trim(), taskDetails[1].trim());
-                    tasks.add(deadline);
-                    yield taskAdditionResponse(deadline);
-                }
-                case "todo" -> {
-                    Todo todo = new Todo(commandArr[1]);
-                    tasks.add(todo);
-                    yield taskAdditionResponse(todo);
-                }
-                case "event" ->  {
-                    String[] taskDetails = commandArr[1].split("/from");
-                    String[] periodRange = taskDetails[1].split("/to");
-                    Event event = new Event(taskDetails[0], periodRange[0].trim(), periodRange[1].trim());
-                    tasks.add(event);
-                    yield taskAdditionResponse(event);
-                }
-                default -> {
-                    Task task = new Task(currentCommand);
-                    tasks.add(task);
-                    yield taskAdditionResponse(task);
-                }
-            };
-            System.out.println(formatMessage(response));
+
         }
         System.out.println(formatMessage(byeResponse));
 
     }
+
+    private static Deadline getDeadline(String[] commandArr) {
+        if (commandArr.length < 2) {
+            throw new InvalidChatInputException("Give a description for your deadline!");
+        }
+        String[] taskDetails = commandArr[1].split("/by");
+        if (taskDetails.length < 2) {
+            throw new InvalidChatInputException("Add /by <due date> for deadlines!");
+        }
+        return new Deadline(taskDetails[0].trim(), taskDetails[1].trim());
+    }
+
+    private static Event getEvent(String[] commandArr) {
+        if (commandArr.length < 2) {
+            throw new InvalidChatInputException("Give a description for your event!");
+        }
+        String[] taskDetails = commandArr[1].split("/from | /to");
+        if (taskDetails.length < 2) {
+            throw new InvalidChatInputException("Add /from <start> /to <end> for event!");
+        }
+        return new Event(taskDetails[0], taskDetails[1].trim(), taskDetails[2].trim());
+    }
+
     private static boolean isInt(String intStr) {
         try {
             Integer.parseInt(intStr);
