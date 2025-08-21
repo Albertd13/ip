@@ -24,6 +24,7 @@ public class Chatonator {
                 String response = switch (currentCommand) {
                     case "list" -> getNumberedMessage();
                     case "mark" -> markTask(commandArr);
+                    case "delete" -> deleteTask(commandArr);
                     case "deadline" -> {
                         Deadline deadline = getDeadline(commandArr);
                         tasks.add(deadline);
@@ -52,6 +53,24 @@ public class Chatonator {
         }
         System.out.println(formatMessage(byeResponse));
 
+    }
+    private static String deleteTask(String[] commandArr) {
+        if (commandArr.length < 2) {
+            throw new InvalidChatInputException("Enter index of task to delete!");
+        }
+        if (!isInt(commandArr[1])) {
+            throw new InvalidChatInputException("Enter a valid index! delete <index>");
+        }
+        int index = Integer.parseInt(commandArr[1]) - 1;
+        Task deletedTask = tasks.get(index);
+        tasks.remove(index);
+        return String.format("""
+            Noted. I've removed this task:
+                %st
+            Now you have %d tasks in the list.
+            """,
+            deletedTask, tasks.size()
+        );
     }
 
     private static Deadline getDeadline(String[] commandArr) {
