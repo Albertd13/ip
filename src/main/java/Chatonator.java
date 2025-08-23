@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -78,10 +79,10 @@ public class Chatonator {
         String baseString = String.format("%d|%s", task.getStatus() ? 1 : 0, task.name);
         if (task instanceof Todo) {
             return "T|" + baseString;
-        } else if (task instanceof Deadline) {
-            return "D|" + baseString + "|" + ((Deadline) task).getBy();
-        } else if (task instanceof Event) {
-            return "E|" + baseString + String.format("|%s|%s", ((Event) task).getFrom(), ((Event) task).getTo());
+        } else if (task instanceof Deadline d) {
+            return String.format("D|%s|%s", baseString, d.getBy());
+        } else if (task instanceof Event e) {
+            return String.format("E|%s|%s|%s", baseString, e.getFrom(), e.getTo());
         } else {
             throw new ExecutionControl.NotImplementedException("Task type saving is not implemented!");
         }
@@ -90,7 +91,7 @@ public class Chatonator {
     private static Task parseTaskStr(String saveStr) {
         String[] contents = saveStr.split("\\|");
         Task t = switch (contents[0]) {
-            case "D" -> new Deadline(contents[2], contents[3]);
+            case "D" -> new Deadline(contents[2], LocalDate.parse(contents[3]));
             case "E" -> new Event(contents[2], contents[3], contents[4]);
             default -> new Todo(contents[2]);
         };
@@ -162,7 +163,7 @@ public class Chatonator {
         if (taskDetails.length < 2) {
             throw new InvalidChatInputException("Add /by <due date> for deadlines!");
         }
-        return new Deadline(taskDetails[0].trim(), taskDetails[1].trim());
+        return new Deadline(taskDetails[0].trim(), LocalDate.parse(taskDetails[1].trim()));
     }
 
     private static Event getEvent(String[] commandArr) {
