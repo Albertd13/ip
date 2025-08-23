@@ -1,6 +1,10 @@
 public class Task {
-    private final String name;
+    public final String name;
     private boolean status = false;
+
+    public boolean getStatus() {
+        return status;
+    }
 
     public Task(String name) {
         this.name = name;
