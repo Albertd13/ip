@@ -1,7 +1,10 @@
 public class Deadline extends Task {
 
-    protected String by;
+    private final String by;
 
+    public String getBy() {
+        return by;
+    }
     public Deadline(String name, String by) {
         super(name);
         this.by = by;
