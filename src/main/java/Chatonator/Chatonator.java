@@ -3,6 +3,7 @@ package Chatonator;
 import Chatonator.exceptions.InvalidChatInputException;
 import jdk.jshell.spi.ExecutionControl;
 
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Scanner;
@@ -12,10 +13,10 @@ public class Chatonator {
     private static final Path SAVE_FILE_PATH = Paths.get("./data/saveFile.txt");
     private final Ui ui = new Ui();
 
-    public void run() {
+    public void run(InputStream source) {
         CommandHandler commandHandler = new CommandHandler(new Storage(SAVE_FILE_PATH));
         ui.greet();
-        Scanner scanner = new Scanner(System.in);
+        Scanner scanner = new Scanner(source);
         while (true) {
             try {
                 String fullCommand = scanner.nextLine().trim();
@@ -34,6 +35,6 @@ public class Chatonator {
 
     public static void main(String[] args) {
         Chatonator chatbot = new Chatonator();
-        chatbot.run();
+        chatbot.run(System.in);
     }
 }
