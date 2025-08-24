@@ -20,39 +20,39 @@ public class CommandHandler {
         String[] commandArr = fullCommand.split(" ", 2);
         String currentCommand = commandArr[0];
         return switch (currentCommand) {
-            case "list" -> getNumberedTasks();
-            case "mark" -> markTask(commandArr);
-            case "delete" -> deleteTask(commandArr);
-            case "deadline" -> {
-                Deadline deadline = getDeadline(commandArr);
-                taskList.add(deadline);
-                yield taskAdditionResponse(deadline);
+        case "list" -> getNumberedTasks();
+        case "mark" -> markTask(commandArr);
+        case "delete" -> deleteTask(commandArr);
+        case "deadline" -> {
+            Deadline deadline = getDeadline(commandArr);
+            taskList.add(deadline);
+            yield taskAdditionResponse(deadline);
+        }
+        case "todo" -> {
+            if (commandArr.length < 2) {
+                throw new InvalidChatInputException("Give a description for your todo!");
             }
-            case "todo" -> {
-                if (commandArr.length < 2) {
-                    throw new InvalidChatInputException("Give a description for your todo!");
-                }
-                Todo todo = new Todo(commandArr[1]);
-                taskList.add(todo);
-                yield taskAdditionResponse(todo);
+            Todo todo = new Todo(commandArr[1]);
+            taskList.add(todo);
+            yield taskAdditionResponse(todo);
+        }
+        case "event" ->  {
+            Event event = getEvent(commandArr);
+            taskList.add(event);
+            yield taskAdditionResponse(event);
+        }
+        case "save" -> {
+            try {
+                storage.saveTasks(taskList.getAll());
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+                yield "Tasks could not be saved due to an error!";
+            } catch (ExecutionControl.NotImplementedException e) {
+                yield "Chatonator.task.Task was not implemented yet!";
             }
-            case "event" ->  {
-                Event event = getEvent(commandArr);
-                taskList.add(event);
-                yield taskAdditionResponse(event);
-            }
-            case "save" -> {
-                try {
-                    storage.saveTasks(taskList.getAll());
-                } catch (IOException e) {
-                    System.out.println(e.getMessage());
-                    yield "Tasks could not be saved due to an error!";
-                } catch (ExecutionControl.NotImplementedException e) {
-                    yield "Chatonator.task.Task was not implemented yet!";
-                }
-                yield "Tasks saved successfully!";
-            }
-            default -> throw new ExecutionControl.NotImplementedException("Sorry! I do not understand.");
+            yield "Tasks saved successfully!";
+        }
+        default -> throw new ExecutionControl.NotImplementedException("Sorry! I do not understand.");
         };
     }
 
