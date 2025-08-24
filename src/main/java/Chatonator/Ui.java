@@ -1,3 +1,5 @@
+package Chatonator;
+
 public class Ui {
     public void greet() {
         this.sendMessage("""

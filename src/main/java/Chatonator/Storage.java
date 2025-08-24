@@ -1,3 +1,9 @@
+package Chatonator;
+
+import Chatonator.task.Deadline;
+import Chatonator.task.Event;
+import Chatonator.task.Task;
+import Chatonator.task.Todo;
 import jdk.jshell.spi.ExecutionControl;
 
 import java.io.IOException;
@@ -42,7 +48,7 @@ public class Storage {
         } else if (task instanceof Event e) {
             return String.format("E|%s|%s|%s", baseString, e.getFrom(), e.getTo());
         } else {
-            throw new ExecutionControl.NotImplementedException("Task type saving is not implemented!");
+            throw new ExecutionControl.NotImplementedException("Chatonator.task.Task type saving is not implemented!");
         }
     }
 

@@ -1,3 +1,5 @@
+package Chatonator.task;
+
 public class Task {
     public final String name;
     private boolean status = false;

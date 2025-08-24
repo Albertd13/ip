@@ -1,3 +1,6 @@
+package Chatonator;
+
+import Chatonator.exceptions.InvalidChatInputException;
 import jdk.jshell.spi.ExecutionControl;
 
 import java.nio.file.Path;

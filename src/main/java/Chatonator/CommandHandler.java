@@ -1,3 +1,7 @@
+package Chatonator;
+
+import Chatonator.exceptions.InvalidChatInputException;
+import Chatonator.task.*;
 import jdk.jshell.spi.ExecutionControl;
 
 import java.io.IOException;
@@ -44,7 +48,7 @@ public class CommandHandler {
                     System.out.println(e.getMessage());
                     yield "Tasks could not be saved due to an error!";
                 } catch (ExecutionControl.NotImplementedException e) {
-                    yield "Task was not implemented yet!";
+                    yield "Chatonator.task.Task was not implemented yet!";
                 }
                 yield "Tasks saved successfully!";
             }
@@ -108,7 +112,7 @@ public class CommandHandler {
         }
         int taskIndex = Integer.parseInt(markCommandArr[1]) - 1;
         if (taskIndex >= taskList.getCount() || taskIndex < 0) {
-            return "Invalid Task Index";
+            return "Invalid Chatonator.task.Task Index";
         }
         Task selectedTask = taskList.getTask(taskIndex);
         selectedTask.complete();
