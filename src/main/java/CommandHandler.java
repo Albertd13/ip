@@ -2,13 +2,12 @@ import jdk.jshell.spi.ExecutionControl;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 
 public class CommandHandler {
-    private final ArrayList<Task> tasks;
+    private final TaskList taskList;
     private final Storage storage;
     public CommandHandler(Storage storage) {
-        this.tasks = new ArrayList<>(storage.restoreTasks());
+        this.taskList = new TaskList(storage.restoreTasks());
         this.storage = storage;
     }
 
@@ -22,7 +21,7 @@ public class CommandHandler {
             case "delete" -> deleteTask(commandArr);
             case "deadline" -> {
                 Deadline deadline = getDeadline(commandArr);
-                tasks.add(deadline);
+                taskList.add(deadline);
                 yield taskAdditionResponse(deadline);
             }
             case "todo" -> {
@@ -30,17 +29,17 @@ public class CommandHandler {
                     throw new InvalidChatInputException("Give a description for your todo!");
                 }
                 Todo todo = new Todo(commandArr[1]);
-                tasks.add(todo);
+                taskList.add(todo);
                 yield taskAdditionResponse(todo);
             }
             case "event" ->  {
                 Event event = getEvent(commandArr);
-                tasks.add(event);
+                taskList.add(event);
                 yield taskAdditionResponse(event);
             }
             case "save" -> {
                 try {
-                    storage.saveTasks(tasks);
+                    storage.saveTasks(taskList.getAll());
                 } catch (IOException e) {
                     System.out.println(e.getMessage());
                     yield "Tasks could not be saved due to an error!";
@@ -83,14 +82,14 @@ public class CommandHandler {
             throw new InvalidChatInputException("Enter a valid index! delete <index>");
         }
         int index = Integer.parseInt(commandArr[1]) - 1;
-        Task deletedTask = tasks.get(index);
-        tasks.remove(index);
+        Task deletedTask = taskList.getTask(index);
+        taskList.removeTask(index);
         return String.format("""
             Noted. I've removed this task:
                 %st
             Now you have %d tasks in the list.
             """,
-                deletedTask, tasks.size()
+                deletedTask, taskList.getCount()
         );
     }
 
@@ -108,10 +107,10 @@ public class CommandHandler {
             return "Invalid mark command";
         }
         int taskIndex = Integer.parseInt(markCommandArr[1]) - 1;
-        if (taskIndex >= tasks.size() || taskIndex < 0) {
+        if (taskIndex >= taskList.getCount() || taskIndex < 0) {
             return "Invalid Task Index";
         }
-        Task selectedTask = tasks.get(taskIndex);
+        Task selectedTask = taskList.getTask(taskIndex);
         selectedTask.complete();
         return String.format("""
             Nice! I've marked this task as done:
@@ -126,14 +125,14 @@ public class CommandHandler {
                 %s
             Now you have %d tasks in the list.""",
                 task,
-                tasks.size()
+                taskList.getCount()
         );
     }
 
     private String getNumberedTasks() {
         StringBuilder res = new StringBuilder();
-        for (int i = 0; i < tasks.size(); i++) {
-            res.append(String.format("%d. %s\n", i + 1, tasks.get(i)));
+        for (int i = 0; i < taskList.getCount(); i++) {
+            res.append(String.format("%d. %s\n", i + 1, taskList.getTask(i)));
         }
         return res.toString();
     }
