@@ -15,6 +15,12 @@ public class CommandHandler {
         this.storage = storage;
     }
 
+    /**
+     * Handles users string input commands and executes them directly
+     * @param fullCommand the string the user input, max one command
+     * @return the response after handling the command
+     * @throws ExecutionControl.NotImplementedException typically occurs when a command that does not exist is used
+     */
     public String handleCommand(String fullCommand) throws ExecutionControl.NotImplementedException {
 
         String[] commandArr = fullCommand.split(" ", 2);
@@ -56,6 +62,11 @@ public class CommandHandler {
         };
     }
 
+    /**
+     *
+     * @param commandArr contains individual command words
+     * @return Event object based on commandArr
+     */
     private static Event getEvent(String[] commandArr) {
         if (commandArr.length < 2) {
             throw new InvalidChatInputException("Give a description for your event!");
@@ -67,6 +78,11 @@ public class CommandHandler {
         return new Event(taskDetails[0], taskDetails[1].trim(), taskDetails[2].trim());
     }
 
+    /**
+     *
+     * @param commandArr must contain a valid LocalDate representation of YYYY-MM-DD in index 1
+     * @return
+     */
     private static Deadline getDeadline(String[] commandArr) {
         if (commandArr.length < 2) {
             throw new InvalidChatInputException("Give a description for your deadline!");
@@ -78,6 +94,11 @@ public class CommandHandler {
         return new Deadline(taskDetails[0].trim(), LocalDate.parse(taskDetails[1].trim()));
     }
 
+    /**
+     * Deletes a task from the TaskList
+     * @param commandArr must contain a valid index of task to delete
+     * @return response message from deletion
+     */
     private String deleteTask(String[] commandArr) {
         if (commandArr.length < 2) {
             throw new InvalidChatInputException("Enter index of task to delete!");
@@ -97,6 +118,11 @@ public class CommandHandler {
         );
     }
 
+    /**
+     * Checks if a string contains only an integer
+     * @param intStr string containing ONLY an integer
+     * @return true if string contains only an integer
+     */
     private boolean isInt(String intStr) {
         try {
             Integer.parseInt(intStr);
@@ -106,6 +132,11 @@ public class CommandHandler {
         return true;
     }
 
+    /**
+     * Marks task as complete
+     * @param markCommandArr must contain valid task index
+     * @return response message regardless of success or failure to complete task
+     */
     private String markTask(String[] markCommandArr) {
         if (markCommandArr.length < 2 || !isInt(markCommandArr[1])) {
             return "Invalid mark command";

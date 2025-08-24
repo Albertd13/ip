@@ -18,6 +18,13 @@ public class Storage {
     public Storage (Path saveFilePath) {
         this.saveFilePath = saveFilePath;
     }
+
+    /**
+     * Saves provided tasks to a .txt file
+     * @param tasks
+     * @throws IOException
+     * @throws ExecutionControl.NotImplementedException
+     */
     public void saveTasks(List<Task> tasks) throws IOException, ExecutionControl.NotImplementedException {
         try {
             Files.createDirectories(saveFilePath.getParent());
@@ -39,6 +46,11 @@ public class Storage {
         }
     }
 
+    /**
+     * @param task
+     * @return encoded string representing a task to be saved in .txt file
+     * @throws ExecutionControl.NotImplementedException
+     */
     private static String getTaskSaveStr(Task task) throws ExecutionControl.NotImplementedException {
         String baseString = String.format("%d|%s", task.getStatus() ? 1 : 0, task.name);
         if (task instanceof Todo) {
@@ -52,6 +64,10 @@ public class Storage {
         }
     }
 
+    /**
+     *
+     * @return list of tasks from the saveFile if it exists, otherwise returns empty list
+     */
     public List<Task> restoreTasks() {
         ArrayList<Task> tasks = new ArrayList<>();
         if (Files.notExists(saveFilePath)) {
@@ -69,6 +85,11 @@ public class Storage {
         return tasks;
     }
 
+    /**
+     * Parses string from saveFile to convert to a task
+     * @param saveStr
+     * @return Task
+     */
     private static Task parseTaskStr(String saveStr) {
         String[] contents = saveStr.split("\\|");
         Task t = switch (contents[0]) {
