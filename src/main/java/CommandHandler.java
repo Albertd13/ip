@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 
-public class Parser {
+public class CommandHandler {
     private final ArrayList<Task> tasks;
     private final Storage storage;
-    public Parser(Storage storage) {
+    public CommandHandler(Storage storage) {
         this.tasks = new ArrayList<>(storage.restoreTasks());
         this.storage = storage;
     }
