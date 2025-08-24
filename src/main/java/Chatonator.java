@@ -7,19 +7,11 @@ import java.util.Scanner;
 
 public class Chatonator {
     private static final Path SAVE_FILE_PATH = Paths.get("./data/saveFile.txt");
-    private final Storage storage;
-
-    public Chatonator() {
-        this.storage = new Storage(SAVE_FILE_PATH);
-    }
+    private final Ui ui = new Ui();
 
     public void run() {
-        String greeting = """
-                         Hello! I'm CHATONATOR!
-                         What can I do for you?""";
-        String byeResponse = "Bye. Hope to see you again soon!";
-        Parser parser = new Parser(storage);
-        System.out.println(formatMessage(greeting));
+        CommandHandler commandHandler = new CommandHandler(new Storage(SAVE_FILE_PATH));
+        ui.greet();
         Scanner scanner = new Scanner(System.in);
         while (true) {
             try {
@@ -27,28 +19,18 @@ public class Chatonator {
                 if (fullCommand.startsWith("bye")) {
                     break;
                 }
-                String response = parser.handleCommand(fullCommand);
-                System.out.println(formatMessage(response));
+                String response = commandHandler.handleCommand(fullCommand);
+                ui.sendMessage(response);
             } catch (ExecutionControl.NotImplementedException | InvalidChatInputException e) {
-                System.out.println(formatMessage(e.getMessage()));
+                ui.sendMessage(e.getMessage());
             }
 
         }
-        System.out.println(formatMessage(byeResponse));
+        ui.exitBye();
     }
 
     public static void main(String[] args) {
         Chatonator chatbot = new Chatonator();
         chatbot.run();
-    }
-
-    private String formatMessage(String message) {
-        return String.format(
-                """
-                ____________________________________________________________
-                %s
-                ____________________________________________________________
-                """, message.trim()
-        );
     }
 }
