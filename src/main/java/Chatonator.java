@@ -1,22 +1,24 @@
 import jdk.jshell.spi.ExecutionControl;
 
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 
 public class Chatonator {
     private static final Path SAVE_FILE_PATH = Paths.get("./data/saveFile.txt");
-    private static final ArrayList<Task> tasks = new ArrayList<>();
-    public static void main(String[] args) {
-        if (restoreTasks()) {
-            System.out.println("Tasks from previous session restored successfully!");
-        }
+    private ArrayList<Task> tasks = new ArrayList<>();
+    private final Storage storage;
+
+    public Chatonator() {
+        this.storage = new Storage(SAVE_FILE_PATH);
+    }
+
+    public void run() {
+        this.tasks = new ArrayList<>(storage.restoreTasks());
         String greeting = """
                          Hello! I'm CHATONATOR!
                          What can I do for you?""";
@@ -33,37 +35,38 @@ public class Chatonator {
                     break;
                 }
                 String response = switch (currentCommand) {
-                case "list" -> getNumberedMessage();
-                case "mark" -> markTask(commandArr);
-                case "delete" -> deleteTask(commandArr);
-                case "deadline" -> {
-                    Deadline deadline = getDeadline(commandArr);
-                    tasks.add(deadline);
-                    yield taskAdditionResponse(deadline);
-                }
-                case "todo" -> {
-                    if (commandArr.length < 2) {
-                        throw new InvalidChatInputException("Give a description for your todo!");
+                    case "list" -> getNumberedMessage();
+                    case "mark" -> markTask(commandArr);
+                    case "delete" -> deleteTask(commandArr);
+                    case "deadline" -> {
+                        Deadline deadline = getDeadline(commandArr);
+                        tasks.add(deadline);
+                        yield taskAdditionResponse(deadline);
                     }
-                    Todo todo = new Todo(commandArr[1]);
-                    tasks.add(todo);
-                    yield taskAdditionResponse(todo);
-                }
-                case "event" ->  {
-                    Event event = getEvent(commandArr);
-                    tasks.add(event);
-                    yield taskAdditionResponse(event);
-                }
-                case "save" -> {
-                    try {
-                        saveTasks();
-                    } catch (IOException e) {
-                        yield "Tasks could not be saved due to an error!";
-                    } catch (ExecutionControl.NotImplementedException e) {
-                        yield "Task was not implemented yet!";
+                    case "todo" -> {
+                        if (commandArr.length < 2) {
+                            throw new InvalidChatInputException("Give a description for your todo!");
+                        }
+                        Todo todo = new Todo(commandArr[1]);
+                        tasks.add(todo);
+                        yield taskAdditionResponse(todo);
                     }
-                    yield "Tasks saved successfully!";
-                }
+                    case "event" ->  {
+                        Event event = getEvent(commandArr);
+                        tasks.add(event);
+                        yield taskAdditionResponse(event);
+                    }
+                    case "save" -> {
+                        try {
+                            storage.saveTasks(tasks);
+                        } catch (IOException e) {
+                            System.out.println(e.getMessage());
+                            yield "Tasks could not be saved due to an error!";
+                        } catch (ExecutionControl.NotImplementedException e) {
+                            yield "Task was not implemented yet!";
+                        }
+                        yield "Tasks saved successfully!";
+                    }
                     default -> throw new ExecutionControl.NotImplementedException("Sorry! I do not understand.");
                 };
                 System.out.println(formatMessage(response));
@@ -75,68 +78,12 @@ public class Chatonator {
         System.out.println(formatMessage(byeResponse));
     }
 
-    private static String getTaskSaveStr(Task task) throws ExecutionControl.NotImplementedException {
-        String baseString = String.format("%d|%s", task.getStatus() ? 1 : 0, task.name);
-        if (task instanceof Todo) {
-            return "T|" + baseString;
-        } else if (task instanceof Deadline d) {
-            return String.format("D|%s|%s", baseString, d.getBy());
-        } else if (task instanceof Event e) {
-            return String.format("E|%s|%s|%s", baseString, e.getFrom(), e.getTo());
-        } else {
-            throw new ExecutionControl.NotImplementedException("Task type saving is not implemented!");
-        }
+    public static void main(String[] args) {
+        Chatonator chatbot = new Chatonator();
+        chatbot.run();
     }
 
-    private static Task parseTaskStr(String saveStr) {
-        String[] contents = saveStr.split("\\|");
-        Task t = switch (contents[0]) {
-            case "D" -> new Deadline(contents[2], LocalDate.parse(contents[3]));
-            case "E" -> new Event(contents[2], contents[3], contents[4]);
-            default -> new Todo(contents[2]);
-        };
-        if (contents[1].equals("1")) {
-            t.complete();
-        }
-        return t;
-    }
-
-    private static void saveTasks() throws IOException, ExecutionControl.NotImplementedException {
-        try {
-            Files.createDirectories(SAVE_FILE_PATH.getParent());
-            if (Files.notExists(SAVE_FILE_PATH)) {
-                Files.createFile(SAVE_FILE_PATH);
-            }
-            ArrayList<String> saveStrings = new ArrayList<>();
-            for (Task t: tasks) {
-                try {
-                    String saveStr = getTaskSaveStr(t);
-                    saveStrings.add(saveStr);
-                } catch (ExecutionControl.NotImplementedException e) {
-                    throw new ExecutionControl.NotImplementedException("This task type doesn't exist yet!");
-                }
-            }
-            Files.write(SAVE_FILE_PATH, saveStrings);
-        } catch (IOException e) {
-            throw new IOException("Tasks could not be saved!, " + e.getMessage());
-        }
-    }
-    private static boolean restoreTasks() {
-        if (Files.notExists(SAVE_FILE_PATH)) {
-            return false;
-        }
-        try {
-            List<String> savedLines = Files.readAllLines(SAVE_FILE_PATH);
-            for (String saveStr: savedLines) {
-                Task t = parseTaskStr(saveStr);
-                tasks.add(t);
-            }
-        } catch (IOException e) {
-            return false;
-        }
-        return true;
-    }
-    private static String deleteTask(String[] commandArr) {
+    private String deleteTask(String[] commandArr) {
         if (commandArr.length < 2) {
             throw new InvalidChatInputException("Enter index of task to delete!");
         }
@@ -177,7 +124,7 @@ public class Chatonator {
         return new Event(taskDetails[0], taskDetails[1].trim(), taskDetails[2].trim());
     }
 
-    private static boolean isInt(String intStr) {
+    private boolean isInt(String intStr) {
         try {
             Integer.parseInt(intStr);
         } catch (NumberFormatException e) {
@@ -185,7 +132,7 @@ public class Chatonator {
         }
         return true;
     }
-    private static String markTask(String[] markCommandArr) {
+    private String markTask(String[] markCommandArr) {
         if (markCommandArr.length < 2 || !isInt(markCommandArr[1])) {
             return "Invalid mark command";
         }
@@ -202,7 +149,7 @@ public class Chatonator {
         );
     }
 
-    private static String taskAdditionResponse(Task task) {
+    private String taskAdditionResponse(Task task) {
         return String.format("""
             Got it. I've added this task:
                 %s
@@ -212,7 +159,7 @@ public class Chatonator {
         );
 
     }
-    private static String formatMessage(String message) {
+    private String formatMessage(String message) {
         return String.format(
                 """
                 ____________________________________________________________
@@ -221,7 +168,7 @@ public class Chatonator {
                 """, message.trim()
         );
     }
-    private static String getNumberedMessage() {
+    private String getNumberedMessage() {
         StringBuilder res = new StringBuilder();
         for (int i = 0; i < tasks.size(); i++) {
             res.append(String.format("%d. %s\n", i + 1, tasks.get(i)));
