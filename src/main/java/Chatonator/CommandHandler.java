@@ -6,6 +6,7 @@ import jdk.jshell.spi.ExecutionControl;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.List;
 
 public class CommandHandler {
     private final TaskList taskList;
@@ -20,7 +21,7 @@ public class CommandHandler {
         String[] commandArr = fullCommand.split(" ", 2);
         String currentCommand = commandArr[0];
         return switch (currentCommand) {
-            case "list" -> getNumberedTasks();
+            case "list" -> numberedTasks(this.taskList.getAll());
             case "mark" -> markTask(commandArr);
             case "delete" -> deleteTask(commandArr);
             case "deadline" -> {
@@ -51,6 +52,12 @@ public class CommandHandler {
                     yield "Chatonator.task.Task was not implemented yet!";
                 }
                 yield "Tasks saved successfully!";
+            }
+            case "find" -> {
+                if (commandArr.length < 2) {
+                    yield "Enter a keyword to find!";
+                }
+                yield getMatchingTasks(commandArr[1]);
             }
             default -> throw new ExecutionControl.NotImplementedException("Sorry! I do not understand.");
         };
@@ -133,11 +140,25 @@ public class CommandHandler {
         );
     }
 
-    private String getNumberedTasks() {
+    private String numberedTasks(List<Task> taskList) {
         StringBuilder res = new StringBuilder();
-        for (int i = 0; i < taskList.getCount(); i++) {
-            res.append(String.format("%d. %s\n", i + 1, taskList.getTask(i)));
+        for (int i = 0; i < taskList.size(); i++) {
+            res.append(String.format("%d. %s\n", i + 1, taskList.get(i)));
         }
         return res.toString();
+    }
+
+    /**
+     * Searches available tasks for matching keyword, matches as long as keyword is a substring
+     * @param keyword for filtering
+     * @return string containing filtered, numbered list of tasks
+     */
+    private String getMatchingTasks(String keyword) {
+        List<Task> matchingTasks = this.taskList.getAll()
+                .stream()
+                .filter(
+                task -> task.name.matches(String.format(".*%s.*", keyword))
+                ).toList();
+        return numberedTasks(matchingTasks);
     }
 }
