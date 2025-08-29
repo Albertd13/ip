@@ -1,12 +1,11 @@
-import Chatonator.task.Deadline;
-import Chatonator.task.Task;
-import Chatonator.task.TaskList;
-import Chatonator.task.Todo;
+import chatonator.task.Task;
+import chatonator.task.TaskList;
+import chatonator.task.Todo;
 import org.junit.jupiter.api.Test;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -18,7 +17,7 @@ public class TaskListTest {
         TaskList taskList = new TaskList(tasks);
 
         taskList.add(task);
-        assertEquals(taskList.getAll(), Arrays.asList(new Todo("Test")));
+        assertEquals(taskList.getAll(), List.of(new Todo("Test")));
     }
 
 }

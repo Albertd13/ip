@@ -1,4 +1,4 @@
-package Chatonator.task;
+package chatonator.task;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-import Chatonator.Chatonator;
+import chatonator.Chatonator;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 

@@ -1,6 +1,6 @@
-package Chatonator;
+package chatonator;
 
-import Chatonator.exceptions.InvalidChatInputException;
+import chatonator.exceptions.InvalidChatInputException;
 import jdk.jshell.spi.ExecutionControl;
 
 import java.io.InputStream;

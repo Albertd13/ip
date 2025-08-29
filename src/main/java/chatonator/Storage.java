@@ -1,9 +1,9 @@
-package Chatonator;
+package chatonator;
 
-import Chatonator.task.Deadline;
-import Chatonator.task.Event;
-import Chatonator.task.Task;
-import Chatonator.task.Todo;
+import chatonator.task.Deadline;
+import chatonator.task.Event;
+import chatonator.task.Task;
+import chatonator.task.Todo;
 import jdk.jshell.spi.ExecutionControl;
 
 import java.io.IOException;

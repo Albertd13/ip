@@ -1,4 +1,4 @@
-package Chatonator;
+package chatonator;
 
 public class Ui {
     public void greet() {

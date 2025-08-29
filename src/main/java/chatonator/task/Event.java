@@ -1,4 +1,4 @@
-package Chatonator.task;
+package chatonator.task;
 
 public class Event extends Task {
 

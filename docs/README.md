@@ -1,4 +1,4 @@
-# Chatonator.Chatonator User Guide
+# chatonator.chatonator User Guide
 
 // Update the title above to match the actual product name
 
