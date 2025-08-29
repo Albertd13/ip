@@ -93,9 +93,9 @@ public class Storage {
     private static Task parseTaskStr(String saveStr) {
         String[] contents = saveStr.split("\\|");
         Task t = switch (contents[0]) {
-            case "D" -> new Deadline(contents[2], LocalDate.parse(contents[3]));
-            case "E" -> new Event(contents[2], contents[3], contents[4]);
-            default -> new Todo(contents[2]);
+        case "D" -> new Deadline(contents[2], LocalDate.parse(contents[3]));
+        case "E" -> new Event(contents[2], contents[3], contents[4]);
+        default -> new Todo(contents[2]);
         };
         if (contents[1].equals("1")) {
             t.complete();
