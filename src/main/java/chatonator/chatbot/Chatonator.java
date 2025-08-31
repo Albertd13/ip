@@ -1,5 +1,7 @@
-package chatonator;
+package chatonator.chatbot;
 
+import chatonator.Storage;
+import chatonator.Ui;
 import chatonator.exceptions.InvalidChatInputException;
 import jdk.jshell.spi.ExecutionControl;
 

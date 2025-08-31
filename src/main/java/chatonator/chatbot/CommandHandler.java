@@ -1,5 +1,6 @@
-package chatonator;
+package chatonator.chatbot;
 
+import chatonator.Storage;
 import chatonator.exceptions.InvalidChatInputException;
 import chatonator.task.Deadline;
 import chatonator.task.Event;
