@@ -19,6 +19,7 @@ import java.util.List;
 public class CommandHandler {
     private final TaskList taskList;
     private final Storage storage;
+    public static String EXIT_MESSAGE = "Have a nice day! Come back again after completing some tasks!";
 
     /**
      * Initialises the handler with link to task storage
@@ -78,6 +79,7 @@ public class CommandHandler {
             }
             yield getMatchingTasks(commandArr[1]);
         }
+        case "bye" -> CommandHandler.EXIT_MESSAGE;
         default -> throw new ExecutionControl.NotImplementedException("Sorry! I do not understand.");
         };
     }
