@@ -1,12 +1,11 @@
-import chatonator.chatbot.Chatonator;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Timeout;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 
 public class ChatonatorTest {
     @Test
@@ -17,7 +16,6 @@ public class ChatonatorTest {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         PrintStream originalOut = System.out;
         System.setOut(new PrintStream(out));
-        new Chatonator().run(in);
         System.setOut(originalOut);
         assertEquals("""
                 ____________________________________________________________
