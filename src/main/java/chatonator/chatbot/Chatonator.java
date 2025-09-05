@@ -16,7 +16,7 @@ public class Chatonator {
     /**
      * Gets the response to user input
      * @param input user's input chat message
-     * @return Response message
+     * @return Response messagea
      */
     public String getResponse(String input) {
         try {
