@@ -38,6 +38,7 @@ public class CommandHandler {
      */
     public String handleCommand(String fullCommand) throws ExecutionControl.NotImplementedException {
 
+        // splits the main command word with the rest of the command
         String[] commandArr = fullCommand.split(" ", 2);
         String currentCommand = commandArr[0];
         return switch (currentCommand) {
@@ -73,12 +74,7 @@ public class CommandHandler {
             }
             yield "Tasks saved successfully!";
         }
-        case "find" -> {
-            if (commandArr.length < 2) {
-                yield "Enter a keyword to find!";
-            }
-            yield getMatchingTasks(commandArr[1]);
-        }
+        case "find" -> commandArr.length < 2 ? "Enter a keyword to find!" : getMatchingTasks(commandArr[1]);
         case "bye" -> CommandHandler.EXIT_MESSAGE;
         default -> throw new ExecutionControl.NotImplementedException("Sorry! I do not understand.");
         };
@@ -165,7 +161,7 @@ public class CommandHandler {
         }
         int taskIndex = Integer.parseInt(markCommandArr[1]) - 1;
         if (taskIndex >= taskList.getCount() || taskIndex < 0) {
-            return "Invalid Chatonator.task.Task Index";
+            return "Invalid Chatonator Index";
         }
         Task selectedTask = taskList.getTask(taskIndex);
         selectedTask.complete();
