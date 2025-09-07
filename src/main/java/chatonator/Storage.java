@@ -3,6 +3,7 @@ package chatonator;
 import chatonator.task.Deadline;
 import chatonator.task.Event;
 import chatonator.task.Task;
+import chatonator.task.TimedTask;
 import chatonator.task.Todo;
 import jdk.jshell.spi.ExecutionControl;
 
@@ -59,6 +60,8 @@ public class Storage {
             return String.format("D|%s|%s", baseString, d.getBy());
         } else if (task instanceof Event e) {
             return String.format("E|%s|%s|%s", baseString, e.getFrom(), e.getTo());
+        } else if (task instanceof TimedTask timed) {
+            return String.format("TIM|%s|%s", baseString, timed.getDuration());
         } else {
             throw new ExecutionControl.NotImplementedException("Chatonator.task.Task type saving is not implemented!");
         }
