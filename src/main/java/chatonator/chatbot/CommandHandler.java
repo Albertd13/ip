@@ -51,10 +51,7 @@ public class CommandHandler {
             yield taskAdditionResponse(deadline);
         }
         case "todo" -> {
-            if (commandArr.length < 2) {
-                throw new InvalidChatInputException("Give a description for your todo!");
-            }
-            Todo todo = new Todo(commandArr[1]);
+            Todo todo = getTodo(commandArr);
             taskList.add(todo);
             yield taskAdditionResponse(todo);
         }
@@ -63,23 +60,39 @@ public class CommandHandler {
             taskList.add(event);
             yield taskAdditionResponse(event);
         }
-        case "save" -> {
-            try {
-                storage.saveTasks(taskList.getAll());
-            } catch (IOException e) {
-                System.out.println(e.getMessage());
-                yield "Tasks could not be saved due to an error!";
-            } catch (ExecutionControl.NotImplementedException e) {
-                yield "Chatonator.task.Task was not implemented yet!";
-            }
-            yield "Tasks saved successfully!";
-        }
+        case "save" -> saveTasks();
         case "find" -> commandArr.length < 2 ? "Enter a keyword to find!" : getMatchingTasks(commandArr[1]);
         case "bye" -> CommandHandler.EXIT_MESSAGE;
         default -> throw new ExecutionControl.NotImplementedException("Sorry! I do not understand.");
         };
     }
 
+    /**
+     *
+     * @return Response to user after task save is attempted
+     */
+    private String saveTasks() {
+        try {
+            storage.saveTasks(taskList.getAll());
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return "Tasks could not be saved due to an error!";
+        } catch (ExecutionControl.NotImplementedException e) {
+            return "This task has not been implemented yet!";
+        }
+        return "Tasks saved successfully!";
+    }
+    /**
+     * Gets a to-do task depending on commandArr from user input
+     * @param commandArr array split into main command and command details
+     * @return 'to-do' task
+     */
+    private static Todo getTodo(String[] commandArr) {
+        if (commandArr.length < 2) {
+            throw new InvalidChatInputException("Give a description for your todo!");
+        }
+        return new Todo(commandArr[1]);
+    }
     /**
      * Creates Event object based on command params
      * @param commandArr contains individual command words
