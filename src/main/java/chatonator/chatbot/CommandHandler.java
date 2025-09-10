@@ -6,10 +6,12 @@ import chatonator.task.Deadline;
 import chatonator.task.Event;
 import chatonator.task.Task;
 import chatonator.task.TaskList;
+import chatonator.task.TimedTask;
 import chatonator.task.Todo;
 import jdk.jshell.spi.ExecutionControl;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -49,6 +51,11 @@ public class CommandHandler {
             taskList.add(deadline);
             yield taskAdditionResponse(deadline);
         }
+        case "timed" -> {
+            TimedTask timedTask = getTimedTask(commandArr);
+            taskList.add(timedTask);
+            yield taskAdditionResponse(timedTask);
+        }
         case "todo" -> {
             if (commandArr.length < 2) {
                 throw new InvalidChatInputException("Give a description for your todo!");
@@ -84,6 +91,25 @@ public class CommandHandler {
         };
     }
 
+    /**
+     *
+     */
+    private static TimedTask getTimedTask(String[] commandArr) {
+        if (commandArr.length < 2) {
+            throw new InvalidChatInputException("Give a duration for the task! Use /for XXhrs XXmins XXs");
+        }
+        String[] taskDetails = commandArr[1].split("/for ");
+        return new TimedTask(taskDetails[0], myDurationParse(taskDetails[1]));
+
+    }
+
+    private static Duration myDurationParse(String inputStr) {
+        Duration result = Duration.ZERO;
+        result = result.plus(Duration.ofHours(Integer.parseInt(inputStr.split("hrs")[0])));
+        result = result.plus(Duration.ofMinutes(Integer.parseInt(inputStr.split(" ")[1].split("mins")[0])));
+        result = result.plus(Duration.ofSeconds(Integer.parseInt(inputStr.split(" ")[2].split("s")[0])));
+        return result;
+    }
     /**
      * Creates Event object based on command params
      * @param commandArr contains individual command words

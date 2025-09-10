@@ -26,7 +26,7 @@ public class TimedTask extends Task{
             durationString = String.format("%dm %s", minutes, durationString);
         }
         if (hours > 0) {
-            durationString = String.format("%dh %s", minutes, durationString);
+            durationString = String.format("%dh %s", hours, durationString);
         }
         return String.format("[TI]%s {time: %s)", super.toString(), durationString);
     }

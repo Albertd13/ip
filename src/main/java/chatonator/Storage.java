@@ -10,6 +10,7 @@ import jdk.jshell.spi.ExecutionControl;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +64,7 @@ public class Storage {
         } else if (task instanceof TimedTask timed) {
             return String.format("TIM|%s|%s", baseString, timed.getDuration());
         } else {
-            throw new ExecutionControl.NotImplementedException("Chatonator.task.Task type saving is not implemented!");
+            throw new ExecutionControl.NotImplementedException("Task type saving is not implemented!");
         }
     }
 
@@ -90,7 +91,7 @@ public class Storage {
 
     /**
      * Parses string from saveFile to convert to a task
-     * @param saveStr
+     * @param saveStr string containing task details
      * @return Task
      */
     private static Task parseTaskStr(String saveStr) {
@@ -98,6 +99,7 @@ public class Storage {
         Task t = switch (contents[0]) {
         case "D" -> new Deadline(contents[2], LocalDate.parse(contents[3]));
         case "E" -> new Event(contents[2], contents[3], contents[4]);
+        case "TIM" -> new TimedTask(contents[2], Duration.parse(contents[3]));
         default -> new Todo(contents[2]);
         };
         if (contents[1].equals("1")) {
