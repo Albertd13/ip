@@ -5,7 +5,6 @@ import chatonator.chatbot.CommandHandler;
 import javafx.animation.PauseTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -23,8 +22,6 @@ public class MainWindow extends AnchorPane {
     private VBox dialogContainer;
     @FXML
     private TextField userInput;
-    @FXML
-    private Button sendButton;
 
     private Chatonator chatonator;
 
@@ -55,6 +52,7 @@ public class MainWindow extends AnchorPane {
                 DialogBox.getDukeDialog(response, dukeImage)
         );
         userInput.clear();
+        // Exits the application if chatonator returns the exit response
         if (response.equals(CommandHandler.EXIT_MESSAGE)) {
             PauseTransition delay = new PauseTransition(Duration.seconds(1.3));
             delay.setOnFinished(event -> {
