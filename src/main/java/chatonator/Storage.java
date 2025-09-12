@@ -3,12 +3,14 @@ package chatonator;
 import chatonator.task.Deadline;
 import chatonator.task.Event;
 import chatonator.task.Task;
+import chatonator.task.TimedTask;
 import chatonator.task.Todo;
 import jdk.jshell.spi.ExecutionControl;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +61,8 @@ public class Storage {
             return String.format("D|%s|%s", baseString, d.getBy());
         } else if (task instanceof Event e) {
             return String.format("E|%s|%s|%s", baseString, e.getFrom(), e.getTo());
+        } else if (task instanceof TimedTask timed) {
+            return String.format("TIM|%s|%s", baseString, timed.getDuration());
         } else {
             throw new ExecutionControl.NotImplementedException("Task type saving is not implemented!");
         }
@@ -91,7 +95,7 @@ public class Storage {
 
     /**
      * Parses string from saveFile to convert to a task
-     * @param saveStr from saveFile, containing task details
+     * @param saveStr string containing task details
      * @return Task
      */
     private static Task parseTaskStr(String saveStr) throws ExecutionControl.NotImplementedException {
@@ -99,6 +103,7 @@ public class Storage {
         Task t = switch (contents[0]) {
         case "D" -> new Deadline(contents[2], LocalDate.parse(contents[3]));
         case "E" -> new Event(contents[2], contents[3], contents[4]);
+        case "TIM" -> new TimedTask(contents[2], Duration.parse(contents[3]));
         case "T" -> new Todo(contents[2]);
         default -> throw new ExecutionControl.NotImplementedException("Task type not implemented!");
         };
