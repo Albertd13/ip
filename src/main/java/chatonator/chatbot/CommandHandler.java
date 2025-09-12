@@ -40,6 +40,7 @@ public class CommandHandler {
      */
     public String handleCommand(String fullCommand) throws ExecutionControl.NotImplementedException {
 
+        // splits the main command word with the rest of the command
         String[] commandArr = fullCommand.split(" ", 2);
         String currentCommand = commandArr[0];
         return switch (currentCommand) {
@@ -57,10 +58,7 @@ public class CommandHandler {
             yield taskAdditionResponse(timedTask);
         }
         case "todo" -> {
-            if (commandArr.length < 2) {
-                throw new InvalidChatInputException("Give a description for your todo!");
-            }
-            Todo todo = new Todo(commandArr[1]);
+            Todo todo = getTodo(commandArr);
             taskList.add(todo);
             yield taskAdditionResponse(todo);
         }
@@ -69,26 +67,38 @@ public class CommandHandler {
             taskList.add(event);
             yield taskAdditionResponse(event);
         }
-        case "save" -> {
-            try {
-                storage.saveTasks(taskList.getAll());
-            } catch (IOException e) {
-                System.out.println(e.getMessage());
-                yield "Tasks could not be saved due to an error!";
-            } catch (ExecutionControl.NotImplementedException e) {
-                yield "Chatonator.task.Task was not implemented yet!";
-            }
-            yield "Tasks saved successfully!";
-        }
-        case "find" -> {
-            if (commandArr.length < 2) {
-                yield "Enter a keyword to find!";
-            }
-            yield getMatchingTasks(commandArr[1]);
-        }
+        case "save" -> saveTasks();
+        case "find" -> commandArr.length < 2 ? "Enter a keyword to find!" : getMatchingTasks(commandArr[1]);
         case "bye" -> CommandHandler.EXIT_MESSAGE;
         default -> throw new ExecutionControl.NotImplementedException("Sorry! I do not understand.");
         };
+    }
+
+    /**
+     *
+     * @return Response to user after task save is attempted
+     */
+    private String saveTasks() {
+        try {
+            storage.saveTasks(taskList.getAll());
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+            return "Tasks could not be saved due to an error!";
+        } catch (ExecutionControl.NotImplementedException e) {
+            return "This task has not been implemented yet!";
+        }
+        return "Tasks saved successfully!";
+    }
+    /**
+     * Gets a to-do task depending on commandArr from user input
+     * @param commandArr array split into main command and command details
+     * @return 'to-do' task
+     */
+    private static Todo getTodo(String[] commandArr) {
+        if (commandArr.length < 2) {
+            throw new InvalidChatInputException("Give a description for your todo!");
+        }
+        return new Todo(commandArr[1]);
     }
 
     /**
@@ -116,6 +126,7 @@ public class CommandHandler {
      * @return Event
      */
     private static Event getEvent(String[] commandArr) {
+        assert commandArr[0].equals("event");
         if (commandArr.length < 2) {
             throw new InvalidChatInputException("Give a description for your event!");
         }
@@ -132,6 +143,7 @@ public class CommandHandler {
      * @return Deadline
      */
     private static Deadline getDeadline(String[] commandArr) {
+        assert commandArr[0].equals("event");
         if (commandArr.length < 2) {
             throw new InvalidChatInputException("Give a description for your deadline!");
         }
@@ -191,7 +203,7 @@ public class CommandHandler {
         }
         int taskIndex = Integer.parseInt(markCommandArr[1]) - 1;
         if (taskIndex >= taskList.getCount() || taskIndex < 0) {
-            return "Invalid Chatonator.task.Task Index";
+            return "Invalid task Index";
         }
         Task selectedTask = taskList.getTask(taskIndex);
         selectedTask.complete();

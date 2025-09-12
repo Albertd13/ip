@@ -23,9 +23,9 @@ public class Storage {
 
     /**
      * Saves provided tasks to a .txt file
-     * @param tasks
-     * @throws IOException
-     * @throws ExecutionControl.NotImplementedException
+     * @param tasks list of tasks to save
+     * @throws IOException exception from file access/write issues
+     * @throws ExecutionControl.NotImplementedException For tasks with unimplemented save strings
      */
     public void saveTasks(List<Task> tasks) throws IOException, ExecutionControl.NotImplementedException {
         try {
@@ -49,9 +49,9 @@ public class Storage {
     }
 
     /**
-     * @param task
+     * @param task task to encode
      * @return encoded string representing a task to be saved in .txt file
-     * @throws ExecutionControl.NotImplementedException
+     * @throws ExecutionControl.NotImplementedException when task is has unimplemented encoding
      */
     private static String getTaskSaveStr(Task task) throws ExecutionControl.NotImplementedException {
         String baseString = String.format("%d|%s", task.getStatus() ? 1 : 0, task.name);
@@ -69,8 +69,8 @@ public class Storage {
     }
 
     /**
-     *
-     * @return list of tasks from the saveFile if it exists, otherwise returns empty list
+     * Gets tasks from the saveFile if it exists, otherwise returns empty list
+     * @return list of tasks
      */
     public List<Task> restoreTasks() {
         ArrayList<Task> tasks = new ArrayList<>();
@@ -80,8 +80,12 @@ public class Storage {
         try {
             List<String> savedLines = Files.readAllLines(saveFilePath);
             for (String saveStr: savedLines) {
-                Task t = parseTaskStr(saveStr);
-                tasks.add(t);
+                try {
+                    Task t = parseTaskStr(saveStr);
+                    tasks.add(t);
+                } catch (ExecutionControl.NotImplementedException e) {
+                    System.out.println("Task could not be restored due to invalid task type!");
+                }
             }
         } catch (IOException e) {
             return tasks;
@@ -94,13 +98,14 @@ public class Storage {
      * @param saveStr string containing task details
      * @return Task
      */
-    private static Task parseTaskStr(String saveStr) {
+    private static Task parseTaskStr(String saveStr) throws ExecutionControl.NotImplementedException {
         String[] contents = saveStr.split("\\|");
         Task t = switch (contents[0]) {
         case "D" -> new Deadline(contents[2], LocalDate.parse(contents[3]));
         case "E" -> new Event(contents[2], contents[3], contents[4]);
         case "TIM" -> new TimedTask(contents[2], Duration.parse(contents[3]));
-        default -> new Todo(contents[2]);
+        case "T" -> new Todo(contents[2]);
+        default -> throw new ExecutionControl.NotImplementedException("Task type not implemented!");
         };
         if (contents[1].equals("1")) {
             t.complete();
