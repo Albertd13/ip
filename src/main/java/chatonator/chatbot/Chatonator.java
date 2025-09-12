@@ -16,10 +16,11 @@ public class Chatonator {
     /**
      * Gets the response to user input
      * @param input user's input chat message
-     * @return Response messagea
+     * @return Response message
      */
     public String getResponse(String input) {
         try {
+            assert input != null;
             return commandHandler.handleCommand(input);
         } catch (ExecutionControl.NotImplementedException | InvalidChatInputException e) {
             return(e.getMessage());

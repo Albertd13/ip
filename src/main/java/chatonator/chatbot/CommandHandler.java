@@ -90,6 +90,7 @@ public class CommandHandler {
      * @return Event
      */
     private static Event getEvent(String[] commandArr) {
+        assert commandArr[0].equals("event");
         if (commandArr.length < 2) {
             throw new InvalidChatInputException("Give a description for your event!");
         }
@@ -106,6 +107,7 @@ public class CommandHandler {
      * @return Deadline
      */
     private static Deadline getDeadline(String[] commandArr) {
+        assert commandArr[0].equals("event");
         if (commandArr.length < 2) {
             throw new InvalidChatInputException("Give a description for your deadline!");
         }
