@@ -15,7 +15,7 @@ import javafx.stage.Stage;
  */
 public class App extends Application {
 
-    private Chatonator chatonator = new Chatonator();
+    private final Chatonator chatonator = new Chatonator();
 
     @Override
     public void start(Stage stage) {
@@ -23,6 +23,7 @@ public class App extends Application {
             FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource("/view/MainWindow.fxml"));
             AnchorPane ap = fxmlLoader.load();
             Scene scene = new Scene(ap);
+            stage.setTitle("Chatonator");
             stage.setScene(scene);
             fxmlLoader.<MainWindow>getController().setChatonator(chatonator);  // inject the Duke instance
             stage.show();
