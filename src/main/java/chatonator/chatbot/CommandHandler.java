@@ -143,13 +143,13 @@ public class CommandHandler {
      * @return Deadline
      */
     private static Deadline getDeadline(String[] commandArr) {
-        assert commandArr[0].equals("event");
+        assert commandArr[0].equals("deadline");
         if (commandArr.length < 2) {
             throw new InvalidChatInputException("Give a description for your deadline!");
         }
         String[] taskDetails = commandArr[1].split("/by");
         if (taskDetails.length < 2) {
-            throw new InvalidChatInputException("Add /by <due date> for deadlines!");
+            throw new InvalidChatInputException("Add /by YYYY-MM-DD for deadlines!");
         }
         return new Deadline(taskDetails[0].trim(), LocalDate.parse(taskDetails[1].trim()));
     }
