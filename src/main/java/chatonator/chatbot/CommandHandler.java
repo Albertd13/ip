@@ -68,8 +68,8 @@ public class CommandHandler {
             yield taskAdditionResponse(event);
         }
         case "save" -> saveTasks();
-        case "find" -> commandArr.length < 2 ? "Enter a keyword to find!" : getMatchingTasks(commandArr[1]);
-        case "bye" -> CommandHandler.EXIT_MESSAGE;
+        case "find" -> findTasks(commandArr);
+        case "bye" -> EXIT_MESSAGE;
         default -> throw new ExecutionControl.NotImplementedException("Sorry! I do not understand.");
         };
     }
@@ -171,7 +171,7 @@ public class CommandHandler {
         taskList.removeTask(index);
         return String.format("""
             Noted. I've removed this task:
-                %st
+                %s
             Now you have %d tasks in the list.
             """,
                 deletedTask, taskList.getCount()
@@ -234,14 +234,17 @@ public class CommandHandler {
 
     /**
      * Searches available tasks for matching keyword, matches as long as keyword is a substring
-     * @param keyword for filtering
+     * @param commandArr must contain keyword to search for in index 1
      * @return string containing filtered, numbered list of tasks
      */
-    private String getMatchingTasks(String keyword) {
+    private String findTasks(String[] commandArr) {
+        if (commandArr.length < 2) {
+            throw new InvalidChatInputException("Enter a keyword to find!");
+        }
         List<Task> matchingTasks = this.taskList.getAll()
                 .stream()
                 .filter(
-                        task -> task.name.matches(String.format(".*%s.*", keyword))
+                        task -> task.name.matches(String.format(".*%s.*", commandArr[1]))
                 ).toList();
         return numberedTasks(matchingTasks);
     }

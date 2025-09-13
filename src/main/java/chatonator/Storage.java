@@ -28,24 +28,20 @@ public class Storage {
      * @throws ExecutionControl.NotImplementedException For tasks with unimplemented save strings
      */
     public void saveTasks(List<Task> tasks) throws IOException, ExecutionControl.NotImplementedException {
-        try {
-            Files.createDirectories(saveFilePath.getParent());
-            if (Files.notExists(saveFilePath)) {
-                Files.createFile(saveFilePath);
-            }
-            ArrayList<String> saveStrings = new ArrayList<>();
-            for (Task t: tasks) {
-                try {
-                    String saveStr = getTaskSaveStr(t);
-                    saveStrings.add(saveStr);
-                } catch (ExecutionControl.NotImplementedException e) {
-                    throw new ExecutionControl.NotImplementedException("This task type doesn't exist yet!");
-                }
-            }
-            Files.write(saveFilePath, saveStrings);
-        } catch (IOException e) {
-            throw new IOException(e.getMessage());
+        Files.createDirectories(saveFilePath.getParent());
+        if (Files.notExists(saveFilePath)) {
+            Files.createFile(saveFilePath);
         }
+        List<String> saveStrings = new ArrayList<>();
+        for (Task t: tasks) {
+            try {
+                String saveStr = getTaskSaveStr(t);
+                saveStrings.add(saveStr);
+            } catch (ExecutionControl.NotImplementedException e) {
+                throw new ExecutionControl.NotImplementedException("This task type doesn't exist yet!");
+            }
+        }
+        Files.write(saveFilePath, saveStrings);
     }
 
     /**
@@ -100,7 +96,10 @@ public class Storage {
      */
     private static Task parseTaskStr(String saveStr) throws ExecutionControl.NotImplementedException {
         String[] contents = saveStr.split("\\|");
-        Task t = switch (contents[0]) {
+        if (contents.length < 3) {
+            throw new ExecutionControl.NotImplementedException("Task string is invalid!");
+        }
+        Task task = switch (contents[0]) {
         case "D" -> new Deadline(contents[2], LocalDate.parse(contents[3]));
         case "E" -> new Event(contents[2], contents[3], contents[4]);
         case "TIM" -> new TimedTask(contents[2], Duration.parse(contents[3]));
@@ -108,9 +107,9 @@ public class Storage {
         default -> throw new ExecutionControl.NotImplementedException("Task type not implemented!");
         };
         if (contents[1].equals("1")) {
-            t.complete();
+            task.complete();
         }
-        return t;
+        return task;
     }
 
 }
