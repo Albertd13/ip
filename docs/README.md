@@ -1,8 +1,7 @@
 # Chatonator User Guide
 
-// Update the title above to match the actual product name
-
 ![img.png](Ui.png)
+
 Welcome to Chatonator, your ultimate tool for managing and organizing 
 your tasks efficiently for fast typers. With Chatonator, you can easily add deadlines, 
 mark tasks you completed, in order to track your progress!

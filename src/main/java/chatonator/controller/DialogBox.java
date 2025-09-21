@@ -53,6 +53,12 @@ public class DialogBox extends HBox {
         setAlignment(Pos.TOP_LEFT);
     }
 
+    /**
+     * Factory method to create a dialog box for the user.
+     * @param text input from user to be displayed in dialog
+     * @param img image of user
+     * @return DialogBox object containing user input and image
+     */
     public static DialogBox getUserDialog(String text, Image img) {
         var db = new DialogBox(text, img);
         db.setBackground(
@@ -67,7 +73,13 @@ public class DialogBox extends HBox {
         return db;
     }
 
-    public static DialogBox getDukeDialog(String text, Image img) {
+    /**
+     * Factory method to create a dialog box for Chatonator
+     * @param text response from Chatonator to be displayed in dialog
+     * @param img image of Chatonator
+     * @return DialogBox object containing Chatonator response and image
+     */
+    public static DialogBox getChatonatorDialog(String text, Image img) {
         var db = new DialogBox(text, img);
         db.flip();
         return db;

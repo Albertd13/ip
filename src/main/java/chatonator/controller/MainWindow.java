@@ -49,7 +49,7 @@ public class MainWindow extends AnchorPane {
         String response = chatonator.getResponse(input);
         dialogContainer.getChildren().addAll(
                 DialogBox.getUserDialog(input, userImage),
-                DialogBox.getDukeDialog(response, dukeImage)
+                DialogBox.getChatonatorDialog(response, dukeImage)
         );
         userInput.clear();
         // Exits the application if chatonator returns the exit response
