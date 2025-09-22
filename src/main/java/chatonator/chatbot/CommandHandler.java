@@ -13,6 +13,7 @@ import jdk.jshell.spi.ExecutionControl;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 
 /**
@@ -150,6 +151,11 @@ public class CommandHandler {
         String[] taskDetails = commandArr[1].split("/by");
         if (taskDetails.length < 2) {
             throw new InvalidChatInputException("Add /by YYYY-MM-DD for deadlines!");
+        }
+        try {
+            LocalDate.parse(taskDetails[1].trim());
+        } catch (DateTimeParseException e) {
+            throw new InvalidChatInputException("Enter date in YYYY-MM-DD format!");
         }
         return new Deadline(taskDetails[0].trim(), LocalDate.parse(taskDetails[1].trim()));
     }
