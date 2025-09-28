@@ -152,7 +152,7 @@ public class CommandHandler {
             throw new InvalidChatInputException("Give a description for your event!");
         }
         String[] taskDetails = commandArr[1].split("/from | /to");
-        if (taskDetails.length < 2) {
+        if (taskDetails.length < 3) {
             throw new InvalidChatInputException("Add /from <start> /to <end> for event!");
         }
         return new Event(taskDetails[0], taskDetails[1].trim(), taskDetails[2].trim());
