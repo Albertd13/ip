@@ -24,6 +24,8 @@ public class Chatonator {
             return commandHandler.handleCommand(input);
         } catch (ExecutionControl.NotImplementedException | InvalidChatInputException e) {
             return(e.getMessage());
+        } catch (Exception e) {
+            return("An error occurred: " + e.getMessage());
         }
     }
 }

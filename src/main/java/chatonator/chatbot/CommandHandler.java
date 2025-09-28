@@ -116,9 +116,29 @@ public class CommandHandler {
 
     private static Duration myDurationParse(String inputStr) {
         Duration result = Duration.ZERO;
-        result = result.plus(Duration.ofHours(Integer.parseInt(inputStr.split("hrs")[0])));
-        result = result.plus(Duration.ofMinutes(Integer.parseInt(inputStr.split(" ")[1].split("mins")[0])));
-        result = result.plus(Duration.ofSeconds(Integer.parseInt(inputStr.split(" ")[2].split("s")[0])));
+        if (inputStr.contains("hrs")) {
+            Duration added= Duration.ofHours(Integer.parseInt(inputStr.split("hrs")[0]));
+            result = result.plus(added);
+
+            // trim off the hours part
+            inputStr = inputStr.substring(inputStr.indexOf("hrs") + 3).trim();
+        }
+        if (inputStr.contains("mins")) {
+            Duration added = Duration.ofMinutes(
+                    Integer.parseInt(inputStr.split("mins")[0].trim().split(" ")[0]));
+            result = result.plus(added);
+
+            // trim off the minutes part
+            inputStr = inputStr.substring(inputStr.indexOf("mins") + 4).trim();
+        }
+        if (inputStr.contains("s")) {
+            Duration added = Duration.ofSeconds(
+                    Integer.parseInt(inputStr.split("s")[0].trim().split(" ")[0]));
+            result = result.plus(added);
+        }
+        if (result.isZero()) {
+            throw new InvalidChatInputException("Enter a valid duration! Use /for XXhrs XXmins XXs");
+        }
         return result;
     }
     /**
